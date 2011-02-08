@@ -1,6 +1,20 @@
 = ws-io
 
-Description goes here.
+The bridge between WebSocket and IO
+
+== Install
+
+  gem install ws-io
+
+== Example
+
+  require "ws-io"
+  
+  WsIo.start(['*'], 8080) do
+    system '/bin/sh'
+  end
+
+See also the ./examples.
 
 == Contributing to ws-io
  
@@ -14,6 +28,4 @@ Description goes here.
 
 == Copyright
 
-Copyright (c) 2011 jugyo. See LICENSE.txt for
-further details.
-
+Copyright (c) 2011 jugyo. See LICENSE.txt for further details.

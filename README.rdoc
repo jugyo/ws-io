@@ -14,6 +14,8 @@ The bridge between WebSocket and IO
     system '/bin/sh'
   end
 
+and open ./examples/index.html
+
 See also the ./examples.
 
 == Contributing to ws-io

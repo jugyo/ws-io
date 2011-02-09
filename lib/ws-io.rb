@@ -36,6 +36,7 @@ class WsIo
         begin
           yield
         ensure
+          unfake_io
           stop_server
         end
       end
@@ -56,10 +57,14 @@ class WsIo
       threads.each do |thread|
         thread.join
       end
-    rescue SignalException, StandardError
+    rescue SignalException, StandardError => e
+      g e
       unfake_io
-    rescue Exception
+      stop_server
+    rescue Exception => e
+      g e
       unfake_io
+      stop_server
       raise
     end
 

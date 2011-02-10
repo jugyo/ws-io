@@ -84,10 +84,9 @@ class WsIo
       STDIN.reopen(@stdin)
       STDOUT.reopen(@stdout)
       STDERR.reopen(@stderr)
-      @in_read.close
-      @in_write.close
-      @out_write.close
-      @out_read.close
+      [@in_read, @in_write, @out_read, @out_write].each do |io|
+        io.close unless io.closed?
+      end
       g 'unfake_io'
     end
 

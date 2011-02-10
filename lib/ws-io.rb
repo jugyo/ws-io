@@ -35,6 +35,8 @@ class WsIo
       threads << Thread.start do
         begin
           yield
+        rescue => e
+          g e
         ensure
           unfake_io
           stop_server
@@ -88,12 +90,16 @@ class WsIo
         io.close unless io.closed?
       end
       g 'unfake_io'
+    rescue => e
+      g e
     end
 
     def stop_server
       ws.close
       @server.tcp_server.close
       g 'stop_server'
+    rescue => e
+      g e
     end
 
     def stop

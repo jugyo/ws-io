@@ -1,7 +1,8 @@
 #!/usr/bin/env ruby
 $:.unshift File.dirname(__FILE__) + "/../lib"
+
 require "ws-io"
 
-WsIo.start(8080) {
+WsIo.start {
   system '/bin/sh'
-}.join
+}.open.join

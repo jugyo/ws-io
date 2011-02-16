@@ -6,7 +6,7 @@ require "launchy"
 
 class WsIo
   class << self
-    attr_accessor :ws
+    attr_accessor :ws, :domains, :port
 
     if ENV['WSIO_DEBUG']
       require 'g'
@@ -15,12 +15,15 @@ class WsIo
     end
 
     def start(port = 8080, domains = ["*"])
+      @port = port
+      @domains = domains
+
       fake_io
 
       m = Mutex.new
       c = ConditionVariable.new
 
-      server_thread = Thread.start do
+      @server_thread = Thread.start do
         @server = WebSocketServer.new(:accepted_domains => domains, :port => port)
         begin
           @server.run() do |ws|
@@ -66,9 +69,7 @@ class WsIo
         end
       end
 
-      open_page(port)
-
-      server_thread
+      self
     rescue SignalException, StandardError => e
       g e
       unfake_io
@@ -81,11 +82,21 @@ class WsIo
       raise
     end
 
-    def open_page(port)
+    def after
+      yield
+      self
+    end
+
+    def join
+      @server_thread.join if @server_thread
+    end
+
+    def open
       tempfile = Tempfile.open('ws-io')
       tempfile << ERB.new(File.read(File.expand_path('../index.html.erb', __FILE__))).result(binding)
       tempfile.flush
       Launchy::Browser.run(tempfile.path)
+      self
     end
 
     def fake_io

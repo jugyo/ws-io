@@ -4,7 +4,7 @@
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js?v=1"></script>
     <script type="text/javascript" charset="utf-8">
       $(function() {
-        var ws = new WebSocket("ws://127.0.0.1:8080");
+        var ws = new WebSocket("ws://127.0.0.1:<%= port %>");
         ws.onmessage = function(e) {
           $("#result").append($("<div>").html(e.data));
           $("body").scrollTop(document.height);

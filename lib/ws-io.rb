@@ -1,5 +1,8 @@
-require 'web_socket'
 require 'erb'
+require 'thread'
+require 'tempfile'
+require 'web_socket'
+require "launchy"
 
 class WsIo
   class << self
@@ -19,27 +22,29 @@ class WsIo
 
       server_thread = Thread.start do
         @server = WebSocketServer.new(:accepted_domains => domains, :port => port)
-        c.signal
-        @server.run() do |ws|
-          if ws.path == "/"
-            ws.handshake()
-            WsIo.ws = ws
-            ws.send("connected")
-            while data = ws.receive()
-              WsIo.input(data)
-            end
-          else
-            ws.handshake("404 Not Found")
-          end
-          stop_server
-        end
-      end
-
-      m.synchronize { c.wait(m) }
-
-      Thread.start do
+        begin
+          @server.run() do |ws|
+            if ws.path == "/"
+              ws.handshake()
+              WsIo.ws = ws
+              ws.send("connected")
+              c.signal                      # ####
+              while data = ws.receive()          #
+                WsIo.input(data)                 #
+              end                                #
+            else                                 #  ##     ## ##     ## ######## ######## ##     ## ####
+              ws.handshake("404 Not Found")      #  ###   ### ##     ##    ##    ##        ##   ##  ####
+            end                                  #  #### #### ##     ##    ##    ##         ## ##   ####
+            stop_server                          #  ## ### ## ##     ##    ##    ######      ###     ##
+          end                                    #  ##     ## ##     ##    ##    ##         ## ##
+        rescue => e                              #  ##     ## ##     ##    ##    ##        ##   ##  ####
+          g e                                    #  ##     ##  #######     ##    ######## ##     ## ####
+        end                                      #
+      end                                        #
+                                                 #
+      Thread.start do                            #
+        m.synchronize { c.wait(m) }         # <###
         loop do
-          break if @ws && @ws.instance_variable_get(:@socket).closed?
           if @ws
             begin
               @ws.send(escape(output))
@@ -61,16 +66,26 @@ class WsIo
         end
       end
 
+      open_page(port)
+
       server_thread
     rescue SignalException, StandardError => e
       g e
       unfake_io
       stop_server
+      raise
     rescue Exception => e
       g e
       unfake_io
       stop_server
       raise
+    end
+
+    def open_page(port)
+      tempfile = Tempfile.open('ws-io')
+      tempfile << ERB.new(File.read(File.expand_path('../index.html.erb', __FILE__))).result(binding)
+      tempfile.flush
+      Launchy::Browser.run(tempfile.path)
     end
 
     def fake_io

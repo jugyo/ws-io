@@ -14,7 +14,7 @@ class WsIo
       def g(*args);end
     end
 
-    def start(domains = ["*"], port = 8080)
+    def start(port = 8080, domains = ["*"])
       fake_io
 
       m = Mutex.new

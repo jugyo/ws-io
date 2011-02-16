@@ -4,19 +4,25 @@ The bridge between WebSocket and IO
 
 == Install
 
-  gem install ws-io
+  % gem install ws-io
 
 == Example
 
   require "ws-io"
   
-  WsIo.start(['*'], 8080) do
+  WsIo.start {
     system '/bin/sh'
-  end
+  }.open.join
 
 and open ./examples/index.html
 
 See also the ./examples.
+
+== ws-irb
+
+Also the 'ws-irb' command will be installed. It provides irb on browser.
+
+  % ws-irb
 
 == Contributing to ws-io
  

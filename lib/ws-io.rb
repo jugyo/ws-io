@@ -14,14 +14,17 @@ class WsIo
     def start(domains = ["*"], port = 8080)
       fake_io
 
-      threads = []
+      m = Mutex.new
+      c = ConditionVariable.new
 
-      threads << Thread.start do
+      server_thread = Thread.start do
         @server = WebSocketServer.new(:accepted_domains => domains, :port => port)
+        c.signal
         @server.run() do |ws|
           if ws.path == "/"
             ws.handshake()
             WsIo.ws = ws
+            ws.send("connected")
             while data = ws.receive()
               WsIo.input(data)
             end
@@ -32,18 +35,9 @@ class WsIo
         end
       end
 
-      threads << Thread.start do
-        begin
-          yield
-        rescue => e
-          g e
-        ensure
-          unfake_io
-          stop_server
-        end
-      end
+      m.synchronize { c.wait(m) }
 
-      threads << Thread.start do
+      Thread.start do
         loop do
           break if @ws && @ws.instance_variable_get(:@socket).closed?
           if @ws
@@ -56,9 +50,18 @@ class WsIo
         end
       end
 
-      threads.each do |thread|
-        thread.join
+      Thread.start do
+        begin
+          yield
+        rescue => e
+          g e
+        ensure
+          unfake_io
+          stop_server
+        end
       end
+
+      server_thread
     rescue SignalException, StandardError => e
       g e
       unfake_io

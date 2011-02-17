@@ -30,7 +30,6 @@ class WsIo
             if ws.path == "/"
               ws.handshake()
               WsIo.ws = ws
-              ws.send("connected")
               c.signal                      # ####
               while data = ws.receive()          #
                 WsIo.input(data)                 #
@@ -47,6 +46,7 @@ class WsIo
                                                  #
       Thread.start do                            #
         m.synchronize { c.wait(m) }         # <###
+        @after_block.call if @after_block
         loop do
           if @ws
             begin
@@ -82,8 +82,8 @@ class WsIo
       raise
     end
 
-    def after
-      yield
+    def after(&block)
+      @after_block = block
       self
     end
 

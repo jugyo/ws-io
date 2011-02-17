@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{ws-io}
-  s.version = "1.1.2"
+  s.version = "1.1.3"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["jugyo"]
@@ -29,7 +29,9 @@ Gem::Specification.new do |s|
     "VERSION",
     "bin/ws-irb",
     "examples/sh.rb",
-    "lib/index.html.erb",
+    "lib/public/autoresize.jquery.js",
+    "lib/public/index.html.erb",
+    "lib/public/jquery.min.js",
     "lib/ws-io.rb",
     "spec/spec_helper.rb",
     "spec/ws-io_spec.rb",

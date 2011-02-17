@@ -4,6 +4,7 @@ source "http://rubygems.org"
 #   gem "activesupport", ">= 2.3.5"
 
 gem "web-socket-ruby", "~> 0.1.0", :require => "web_socket"
+gem "launchy"
 
 # Add dependencies to develop your gem here.
 # Include everything needed to run rake, tests, features, etc.

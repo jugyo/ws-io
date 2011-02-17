@@ -92,8 +92,12 @@ class WsIo
     end
 
     def open
+      js_paths = %w(jquery.min.js autoresize.jquery.js).map do |js|
+        'file://localhost' + File.expand_path("../public/#{js}", __FILE__)
+      end
       tempfile = Tempfile.open('ws-io')
-      tempfile << ERB.new(File.read(File.expand_path('../index.html.erb', __FILE__))).result(binding)
+      template = File.read(File.expand_path('../public/index.html.erb', __FILE__))
+      tempfile << ERB.new(template, nil, '-').result(binding)
       tempfile.flush
       Launchy::Browser.run(tempfile.path)
       self

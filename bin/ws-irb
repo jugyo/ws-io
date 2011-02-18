@@ -2,8 +2,14 @@
 $:.unshift File.dirname(__FILE__) + "/../lib"
 require "ws-io"
 require 'irb'
+require 'optparse'
 
-WsIo.start {
+port = 8080
+opt = OptionParser.new
+opt.on('-p PORT') {|v| port = v }
+opt.parse!(ARGV)
+
+WsIo.start(port) {
   IRB.start
 }.after {
   WsIo.ws.send(

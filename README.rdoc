@@ -14,10 +14,6 @@ The bridge between WebSocket and IO
     system '/bin/sh'
   }.open.join
 
-and open ./examples/index.html
-
-See also the ./examples.
-
 == ws-irb
 
 Also the 'ws-irb' command will be installed. It provides irb on browser.

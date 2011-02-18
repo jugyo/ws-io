@@ -20,6 +20,7 @@ class WsIo
 
       fake_io
 
+      Thread.abort_on_exception = true
       m = Mutex.new
       c = ConditionVariable.new
 
@@ -39,10 +40,8 @@ class WsIo
             end                                  #  #### #### ##     ##    ##    ##         ## ##   ####
             stop_server                          #  ## ### ## ##     ##    ##    ######      ###     ##
           end                                    #  ##     ## ##     ##    ##    ##         ## ##
-        rescue => e                              #  ##     ## ##     ##    ##    ##        ##   ##  ####
-          g e                                    #  ##     ##  #######     ##    ######## ##     ## ####
-        end                                      #
-      end                                        #
+        end                                      #  ##     ## ##     ##    ##    ##        ##   ##  ####
+      end                                        #  ##     ##  #######     ##    ######## ##     ## ####
                                                  #
       Thread.start do                            #
         m.synchronize { c.wait(m) }         # <###
@@ -70,16 +69,6 @@ class WsIo
       end
 
       self
-    rescue SignalException, StandardError => e
-      g e
-      unfake_io
-      stop_server
-      raise
-    rescue Exception => e
-      g e
-      unfake_io
-      stop_server
-      raise
     end
 
     def after(&block)
@@ -89,6 +78,11 @@ class WsIo
 
     def join
       @server_thread.join if @server_thread
+    rescue Exception => e
+      g e
+    rescue
+      unfake_io
+      stop_server
     end
 
     def open
@@ -129,7 +123,7 @@ class WsIo
 
     def stop_server
       ws.close
-      @server.tcp_server.close
+      @server.tcp_server.close unless @server.tcp_server.closed?
       g 'stop_server'
     rescue => e
       g e

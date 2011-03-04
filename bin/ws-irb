@@ -12,13 +12,5 @@ opt.parse!(ARGV)
 WsIo.start(port) {
   IRB.start
 }.after {
-  WsIo.ws.send(
-%q[                     _      _     
-                    (_)    | |    
-__      _____ ______ _ _ __| |__  
-\ \ /\ / / __|______| | '__| '_ \ 
- \ V  V /\__ \      | | |  | |_) |
-  \_/\_/ |___/      |_|_|  |_.__/ 
-                                  ]
-  )
+  WsIo.ws.send '#### ws-irb ####'
 }.open.join
